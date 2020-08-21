@@ -1,0 +1,4 @@
+https://covid19api.com/
+https://api.covid19api.com/total/country/indonesia/status/confirmed
+https://api.covid19api.com/total/country/indonesia/status/recovered
+https://api.covid19api.com/total/country/indonesia/status/deaths

@@ -1,0 +1,32 @@
+.line-chart{
+  height: 43rem;
+}
+.ratio-chart{
+    width: 25rem;
+    height: 30rem;
+}
+.ratio-charts{
+    height: 30rem;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+}
+section{
+    margin-top: 125px;
+    margin-bottom: 125px;
+}
+.numeric-data{
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+}
+.case-number{
+    width: 23%;
+}
+.case-number-value{
+    font-size: 3.5rem;
+    font-weight: bold;
+}
+.case-number-label{
+    font-size: 2rem;
+}
