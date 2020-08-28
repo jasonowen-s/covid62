@@ -56,7 +56,7 @@ class App extends React.Component{
     let cummulativeDeaths = [];
     let cummulativeRecovery = [];
     let dateLabels = [];
-    Axios.get('https://yacdn.org/serve/https://data.covid19.go.id/public/api/update.json').then(
+    Axios.get('https://covid-fire.now.sh').then(
       (response) => {
         response.data.update.harian.forEach(day => {
           newCases.push(day.jumlah_positif.value);
