@@ -56,23 +56,24 @@ class App extends React.Component{
     let cummulativeDeaths = [];
     let cummulativeRecovery = [];
     let dateLabels = [];
-    Axios.get('https://data.covid19.go.id/public/api/update.json').then(
+
+    Axios.get('https://api.covid19api.com/total/country/ID').then(
       (response) => {
-        response.data.update.harian.forEach(day => {
-          newCases.push(day.jumlah_positif.value);
-          newDeaths.push(day.jumlah_meninggal.value);
-          newRecovery.push(day.jumlah_sembuh.value);
-          cummulativeCases.push(day.jumlah_positif_kum.value);
-          cummulativeDeaths.push(day.jumlah_meninggal_kum.value);
-          cummulativeRecovery.push(day.jumlah_sembuh_kum.value);
+        let responseData = response.data;
+        for (let i = 39; i < responseData.length; i++) {
+          console.log(responseData);
+          newCases.push(responseData[i].Confirmed-responseData[i-1].Confirmed);
+          newDeaths.push(responseData[i].Deaths-responseData[i-1].Deaths);
+          newRecovery.push(responseData[i].Recovered-responseData[i-1].Recovered);
+          cummulativeCases.push(responseData[i].Confirmed);
+          cummulativeDeaths.push(responseData[i].Deaths);
+          cummulativeRecovery.push(responseData[i].Recovered);
           dateLabels.push(
-            new Date(day.key).toLocaleDateString('en-GB')
+            new Date(responseData[i].Date).toLocaleDateString('en-GB')
           );
-        });
-
-        const latestDate = new Date(response.data.update.harian[response.data.update.harian.length-1].key)
+        }
+        const latestDate = new Date(responseData[responseData.length-1].Date)
         .toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
         this.setState({
           newCases: newCases,
           newDeaths: newDeaths,
