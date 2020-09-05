@@ -10,16 +10,7 @@ import './App.css';
 class App extends React.Component{
   render(){
     return (
-        this.state.loading ? 
-        <BounceLoader 
-          css='
-            margin: 27vh auto;
-          '
-          size={300}
-          color={Colors.WHITE}
-          loading={this.state.loading}
-        />
-        :
+        (this.state.loaded === true) ? 
         <div className="App">
           <p>data last updated
           <b> {this.state.latestDate}</b>
@@ -27,6 +18,21 @@ class App extends React.Component{
           <Numeric confirmed={this.state.totalConfirmed} recovered={this.state.totalRecovered} deaths={this.state.totalDeath} />
           <LineCharts incrementalData={this._getIncrementalData()} cummulativeData={this._getCummulativeCasesData()} />
           <RatioCharts recoveryData={this._getRecoveryData()} mortalityData={this._getMortalityData()} />
+        </div>
+        :
+        (this.state.loaded === false) ? 
+        <BounceLoader 
+          css='
+            margin: 27vh auto
+          '
+          size={300}
+          color={Colors.WHITE}
+          loaded={this.state.loaded}
+        />
+        :
+        <div style={{margin: '30vh auto', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          Data Request Timeout <br/>
+          please try again later
         </div>
     );
   }
@@ -44,7 +50,7 @@ class App extends React.Component{
       totalDeath: 0,
       totalConfirmed: 0,
       totalRecovered: 0,
-      loading: true
+      loaded: false
     };
   }
 
@@ -57,11 +63,10 @@ class App extends React.Component{
     let cummulativeRecovery = [];
     let dateLabels = [];
 
-    Axios.get('https://api.covid19api.com/total/country/ID').then(
-      (response) => {
+    Axios.get('https://api.covid19api.com/total/country/ID', {timeout: 5000})
+    .then((response) => {
         let responseData = response.data;
         for (let i = 39; i < responseData.length; i++) {
-          console.log(responseData);
           newCases.push(responseData[i].Confirmed-responseData[i-1].Confirmed);
           newDeaths.push(responseData[i].Deaths-responseData[i-1].Deaths);
           newRecovery.push(responseData[i].Recovered-responseData[i-1].Recovered);
@@ -86,10 +91,12 @@ class App extends React.Component{
           totalRecovered: cummulativeRecovery[cummulativeRecovery.length-1],
           dateLabels: dateLabels,
           latestDate: latestDate,
-          loading: false
+          loaded: true
         });
-      }
-    );
+    })
+    .catch((err) => {
+      this.setState({loaded: undefined})
+    });
   }
 
   _getRecoveryData(){
