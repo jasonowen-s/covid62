@@ -1,102 +1,70 @@
-import Axios from 'axios';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Colors from './Colors';
 import Numeric from './Numeric';
 import LineCharts from './LineCharts';
 import RatioCharts from './RatioCharts';
 import {BounceLoader} from "react-spinners";
+import data from './data.json';
 import './App.css';
 
-class App extends React.Component{
-  render(){
-    return (
-        this.state.loading ? 
-        <BounceLoader 
-          css='
-            margin: 27vh auto;
-          '
-          size={300}
-          color={Colors.WHITE}
-          loading={this.state.loading}
-        />
-        :
-        <div className="App">
-          <p>data last updated
-          <b> {this.state.latestDate}</b>
-          </p>
-          <Numeric confirmed={this.state.totalConfirmed} recovered={this.state.totalRecovered} deaths={this.state.totalDeath} />
-          <LineCharts incrementalData={this._getIncrementalData()} cummulativeData={this._getCummulativeCasesData()} />
-          <RatioCharts recoveryData={this._getRecoveryData()} mortalityData={this._getMortalityData()} />
-        </div>
-    );
-  }
-  
-  constructor(props) {
-    super(props);
-    this.state = {
-      newCases: [],
-      newRecovery: [],
-      newDeaths: [],
-      dateLabels: [],
-      cummulativeCases: [],
-      cummulativeDeaths: [],
-      cummulativeRecovery: [],
-      totalDeath: 0,
-      totalConfirmed: 0,
-      totalRecovered: 0,
-      loading: true
-    };
-  }
+const App = () => {
+  const [newConfirmed, setNewConfirmed] = useState([]);
+  const [newRecoveries, setNewRecoveries] = useState([]);
+  const [newDeaths, setNewDeaths] = useState([]);
+  const [cummulativeConfirmed, setCummulativeConfirmed] = useState([]);
+  const [cummulativeDeaths, setCummulativeDeaths] = useState([]);
+  const [cummulativeReoveries, setCummulativeReoveries] = useState([]);
+  const [totalDeaths, setTotalDeaths] = useState(0);
+  const [totalConfirmed, setTotalConfirmed] = useState(0);
+  const [totalRecoveries, setTotalRecoveries] = useState(0);
+  const [dateLabels, setDateLabels] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [latestDate, setLatestDate] = useState(new Date());
 
-  async componentDidMount() {
-    let newCases = [];
-    let newRecovery = [];
-    let newDeaths = [];
-    let cummulativeCases = [];
-    let cummulativeDeaths = [];
-    let cummulativeRecovery = [];
-    let dateLabels = [];
-    Axios.get('https://data.covid19.go.id/public/api/update.json').then(
-      (response) => {
-        response.data.update.harian.forEach(day => {
-          newCases.push(day.jumlah_positif.value);
-          newDeaths.push(day.jumlah_meninggal.value);
-          newRecovery.push(day.jumlah_sembuh.value);
-          cummulativeCases.push(day.jumlah_positif_kum.value);
-          cummulativeDeaths.push(day.jumlah_meninggal_kum.value);
-          cummulativeRecovery.push(day.jumlah_sembuh_kum.value);
-          dateLabels.push(
-            new Date(day.key).toLocaleDateString('en-GB')
-          );
-        });
+  useEffect(() => {
+    let currentNewConfirmed = [];
+    let currentNewRecoveries = [];
+    let currentNewDeaths = [];
+    let currentCummulativeConfirmed = [];
+    let currentCummulativeDeaths = [];
+    let currentCummulativeRecoveries = [];
+    let currentDateLabels = [];
 
-        const latestDate = new Date(response.data.update.harian[response.data.update.harian.length-1].key)
-        .toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    data.update.harian.forEach(day => {
+      currentNewConfirmed.push(day.jumlah_positif.value);
+      currentNewDeaths.push(day.jumlah_meninggal.value);
+      currentNewRecoveries.push(day.jumlah_sembuh.value);
+      currentCummulativeConfirmed.push(day.jumlah_positif_kum.value);
+      currentCummulativeDeaths.push(day.jumlah_meninggal_kum.value);
+      currentCummulativeRecoveries.push(day.jumlah_sembuh_kum.value);
+      currentDateLabels.push(
+        new Date(day.key).toLocaleDateString('en-GB')
+      );
+    
+      const currentLatestDate = new Date(data.update.harian[data.update.harian.length-1].key)
+      .toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-        this.setState({
-          newCases: newCases,
-          newDeaths: newDeaths,
-          newRecovery: newRecovery,
-          cummulativeDeaths: cummulativeDeaths,
-          cummulativeCases: cummulativeCases,
-          cummulativeRecovery: cummulativeRecovery,
-          totalDeath: cummulativeDeaths[cummulativeDeaths.length-1],
-          totalConfirmed: cummulativeCases[cummulativeCases.length-1],
-          totalRecovered: cummulativeRecovery[cummulativeRecovery.length-1],
-          dateLabels: dateLabels,
-          latestDate: latestDate,
-          loading: false
-        });
-      }
-    );
-  }
+      setNewConfirmed(currentNewConfirmed);
+      setNewDeaths(currentNewDeaths);
+      setNewRecoveries(currentNewRecoveries);
+      setCummulativeConfirmed(currentCummulativeConfirmed);
+      setCummulativeDeaths(currentCummulativeDeaths);
+      setCummulativeReoveries(currentCummulativeRecoveries);
+      setTotalConfirmed(currentCummulativeConfirmed[currentCummulativeConfirmed.length-1]);
+      setTotalDeaths(currentCummulativeDeaths[currentCummulativeDeaths.length-1]);
+      setTotalRecoveries(currentCummulativeRecoveries[currentCummulativeRecoveries.length-1]);
+      setDateLabels(currentDateLabels);
+      setLatestDate(currentLatestDate);
+      setIsLoading(false);
+    });
+  }, [data]);
 
-  _getRecoveryData(){
+  const _getRecoveryData = () => {
     return {
       labels: ["recovered", "confirmed"],
       datasets: [
         {
-          data: [this.state.totalRecovered, this.state.totalConfirmed],
+          data: [totalRecoveries, totalConfirmed],
           fill: true,
           backgroundColor: [
             Colors.BLUE,
@@ -107,12 +75,12 @@ class App extends React.Component{
     };
   }
 
-  _getMortalityData(){
+  const _getMortalityData = () => {
     return {
       labels: ["deaths", "confirmed"],
       datasets: [
         {
-          data: [this.state.totalDeath, this.state.totalConfirmed],
+          data: [totalDeaths, totalConfirmed],
           fill: true,
           backgroundColor: [
             Colors.RED,
@@ -123,15 +91,15 @@ class App extends React.Component{
     };
   }
 
-  _getIncrementalData(){
+  const _getIncrementalData = () => {
     return{
-      labels: this.state.dateLabels,
+      labels: dateLabels,
       datasets: [
         {
           label: "deaths",
           backgroundColor: Colors.RED,
           borderColor: Colors.RED,
-          data: this.state.newDeaths,
+          data: newDeaths,
           hidden: true,
           fill: false,
         },
@@ -139,7 +107,7 @@ class App extends React.Component{
           label: "recovered",
           backgroundColor: Colors.BLUE,
           borderColor: Colors.BLUE,
-          data: this.state.newRecovery,
+          data: newRecoveries,
           hidden: true,
           fill: false,
         },
@@ -147,41 +115,62 @@ class App extends React.Component{
           label: "confirmed",
           backgroundColor: Colors.GREEN,
           borderColor: Colors.GREEN,
-          data: this.state.newCases,
+          data: newConfirmed,
           fill: false,
         },
       ],
     };
   }
 
-  _getCummulativeCasesData(){
+  const _getCummulativeCasesData = () => {
     return{
-      labels: this.state.dateLabels,
+      labels: dateLabels,
       datasets: [
         {
           label: "deaths",
           backgroundColor: Colors.RED_TRANSPARENT,
           borderColor: Colors.RED,
-          data: this.state.cummulativeDeaths,
+          data: cummulativeDeaths,
           fill: true,
         },
         {
           label: "recovered",
           backgroundColor: Colors.BLUE_TRANSPARENT,
           borderColor: Colors.BLUE,
-          data: this.state.cummulativeRecovery,
+          data: cummulativeReoveries,
           fill: true,
         },
         {
           label: "confirmed",
           backgroundColor: Colors.GREEN_TRANSPARENT,
           borderColor: Colors.GREEN,
-          data: this.state.cummulativeCases,
+          data: cummulativeConfirmed,
           fill: true,
         },
       ],
     };
   }
+
+  return (
+    isLoading ? 
+    <BounceLoader 
+      css='
+        margin: 27vh auto;
+      '
+      size={300}
+      color={Colors.WHITE}
+      loading={isLoading}
+    />
+    :
+    <div className="App">
+      <p>data last updated
+      <b> {latestDate}</b>
+      </p>
+      <Numeric confirmed={totalConfirmed} recovered={totalRecoveries} deaths={totalDeaths} />
+      <LineCharts incrementalData={_getIncrementalData()} cummulativeData={_getCummulativeCasesData()} />
+      <RatioCharts recoveryData={_getRecoveryData()} mortalityData={_getMortalityData()} />
+    </div>
+  );
 }
 
 export default App;
