@@ -57,7 +57,7 @@ const App = () => {
       setLatestDate(currentLatestDate);
       setIsLoading(false);
     });
-  }, [data]);
+  }, []);
 
   const _getRecoveryData = () => {
     return {
@@ -151,21 +151,26 @@ const App = () => {
     };
   }
 
+  const renderLoadingAnimation = () => {
+    return (
+      <BounceLoader 
+        css='
+          margin: 27vh auto;
+        '
+        size={300}
+        color={Colors.WHITE}
+        loading={isLoading}
+      />
+    )
+  }
+
   return (
     isLoading ? 
-    <BounceLoader 
-      css='
-        margin: 27vh auto;
-      '
-      size={300}
-      color={Colors.WHITE}
-      loading={isLoading}
-    />
-    :
+    renderLoadingAnimation() :
     <div className="App">
-      <p>data last updated
-      <b> {latestDate}</b>
-      </p>
+      <div>
+        data last updated <span className='latest-date'> {latestDate} </span>
+      </div>
       <Numeric confirmed={totalConfirmed} recovered={totalRecoveries} deaths={totalDeaths} />
       <LineCharts incrementalData={_getIncrementalData()} cummulativeData={_getCummulativeCasesData()} />
       <RatioCharts recoveryData={_getRecoveryData()} mortalityData={_getMortalityData()} />

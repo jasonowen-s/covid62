@@ -30,3 +30,6 @@ section{
 .case-number-label{
     font-size: 2rem;
 }
+.latest-date {
+    font-weight: bold;
+}
