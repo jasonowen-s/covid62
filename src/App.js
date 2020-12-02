@@ -12,7 +12,6 @@ const App = () => {
   const [covidData, setCovidData] = useState({});
 
   useEffect(() => {
-    console.log(isLoading);
     let currentNewConfirmed = [];
     let currentNewRecoveries = [];
     let currentNewDeaths = [];
