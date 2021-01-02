@@ -18,6 +18,7 @@ const App = () => {
     let currentCummulativeConfirmed = [];
     let currentCummulativeDeaths = [];
     let currentCummulativeRecoveries = [];
+    let currentCummulativeActive = [];
     let currentDateLabels = [];
     Axios.get('https://raw.githubusercontent.com/jasonowen-s/covid62-data/main/data.json')
       .then((res) => {
@@ -29,6 +30,7 @@ const App = () => {
           currentCummulativeConfirmed.push(day.jumlah_positif_kum.value);
           currentCummulativeDeaths.push(day.jumlah_meninggal_kum.value);
           currentCummulativeRecoveries.push(day.jumlah_sembuh_kum.value);
+          currentCummulativeActive.push(day.jumlah_positif_kum.value - day.jumlah_sembuh_kum.value - day.jumlah_meninggal_kum.value);
           currentDateLabels.push(
             new Date(day.key).toLocaleDateString('en-GB')
           );
@@ -42,6 +44,7 @@ const App = () => {
           cummulativeConfirmed: currentCummulativeConfirmed,
           cummulativeDeaths: currentCummulativeDeaths,
           cummulativeReoveries: currentCummulativeRecoveries,
+          cummulativeActive: currentCummulativeActive,
           totalConfirmed: currentCummulativeConfirmed[currentCummulativeConfirmed.length-1],
           totalDeaths: currentCummulativeDeaths[currentCummulativeDeaths.length-1],
           totalRecoveries: currentCummulativeRecoveries[currentCummulativeRecoveries.length-1],
@@ -125,6 +128,13 @@ const App = () => {
           backgroundColor: Colors.RED_TRANSPARENT,
           borderColor: Colors.RED,
           data: covidData.cummulativeDeaths,
+          fill: true,
+        },
+        {
+          label: "active",
+          backgroundColor: Colors.WHITE_TRANSPARENT,
+          borderColor: Colors.WHITE,
+          data: covidData.cummulativeActive,
           fill: true,
         },
         {
