@@ -3,9 +3,10 @@ import * as Colors from './Colors';
 import Numeric from './Numeric';
 import LineCharts from './LineCharts';
 import RatioCharts from './RatioCharts';
-import {BounceLoader} from "react-spinners";
+import {BounceLoader} from 'react-spinners';
 import './App.css';
 import Axios from 'axios';
+import { Radio } from 'antd';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -63,7 +64,7 @@ const App = () => {
 
   const _getRecoveryData = () => {
     return {
-      labels: ["recovered", "confirmed"],
+      labels: ['recovered', 'confirmed'],
       datasets: [
         {
           data: [totalData.totalRecoveries, totalData.totalConfirmed],
@@ -79,7 +80,7 @@ const App = () => {
 
   const _getMortalityData = () => {
     return {
-      labels: ["deaths", "confirmed"],
+      labels: ['deaths', 'confirmed'],
       datasets: [
         {
           data: [totalData.totalDeaths, totalData.totalConfirmed],
@@ -98,7 +99,7 @@ const App = () => {
       labels: timeSeriesData.dateLabels.slice(filterDays),
       datasets: [
         {
-          label: "deaths",
+          label: 'deaths',
           backgroundColor: Colors.RED,
           borderColor: Colors.RED,
           data: timeSeriesData.newDeaths.slice(filterDays),
@@ -106,7 +107,7 @@ const App = () => {
           fill: false,
         },
         {
-          label: "recovered",
+          label: 'recovered',
           backgroundColor: Colors.BLUE,
           borderColor: Colors.BLUE,
           data: timeSeriesData.newRecoveries.slice(filterDays),
@@ -114,7 +115,7 @@ const App = () => {
           fill: false,
         },
         {
-          label: "confirmed",
+          label: 'confirmed',
           backgroundColor: Colors.GREEN,
           borderColor: Colors.GREEN,
           data: timeSeriesData.newConfirmed.slice(filterDays),
@@ -129,28 +130,28 @@ const App = () => {
       labels: timeSeriesData.dateLabels.slice(filterDays),
       datasets: [
         {
-          label: "deaths",
+          label: 'deaths',
           backgroundColor: Colors.RED_TRANSPARENT,
           borderColor: Colors.RED,
           data: timeSeriesData.cummulativeDeaths.slice(filterDays),
           fill: true,
         },
         {
-          label: "active",
+          label: 'active',
           backgroundColor: Colors.WHITE_TRANSPARENT,
           borderColor: Colors.WHITE,
           data: timeSeriesData.cummulativeActive.slice(filterDays),
           fill: true,
         },
         {
-          label: "recovered",
+          label: 'recovered',
           backgroundColor: Colors.BLUE_TRANSPARENT,
           borderColor: Colors.BLUE,
           data: timeSeriesData.cummulativeReoveries.slice(filterDays),
           fill: true,
         },
         {
-          label: "confirmed",
+          label: 'confirmed',
           backgroundColor: Colors.GREEN_TRANSPARENT,
           borderColor: Colors.GREEN,
           data: timeSeriesData.cummulativeConfirmed.slice(filterDays),
@@ -173,22 +174,30 @@ const App = () => {
   )
 }
 
+const renderFilterDays = () => {
+  const options = [
+    { label: 'All', value: 0 },
+    { label: '3 Months', value: -90 },
+    { label: '30 Days', value: -30 },
+    { label: '7 Days', value: -7 },
+  ];
+  return (
+    <Radio.Group
+      options={options}
+      onChange={(event) => setFilterDays(event.target.value)}
+      value={filterDays}
+      optionType='button'
+      buttonStyle='solid'
+    />
+  )
+}
+
 return (
   isLoading ? 
   renderLoadingAnimation() :
-  <div className="App">
+  <div className='App'>
     <span className='latest-date'> {timeSeriesData.latestDate} </span>
-    <div
-      class="filter"
-      style={{
-          display:'flex'
-        }}
-      >
-        <div class=""><i class="fa fa-filter" aria-hidden="true"></i></div>
-        <div class="" onClick={() => setFilterDays(0)} style={{marginRight:'1rem'}}>All</div>
-        <div class="" onClick={() => setFilterDays(-30)} style={{marginRight:'1rem'}}>30 Days</div>
-        <div class="" onClick={() => setFilterDays(-7)} style={{marginRight:'1rem'}}>7 Days</div>
-      </div>
+    {renderFilterDays()}
     <Numeric confirmed={totalData.totalConfirmed} recovered={totalData.totalRecoveries} deaths={totalData.totalDeaths} />
     <LineCharts incrementalData={_getIncrementalData()} cummulativeData={_getCummulativeCasesData(filterDays)} />
     <RatioCharts recoveryData={_getRecoveryData()} mortalityData={_getMortalityData()} />

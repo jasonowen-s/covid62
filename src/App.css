@@ -1,3 +1,5 @@
+@import './antd.css';
+
 .line-chart{
   height: 43rem;
 }
@@ -12,7 +14,7 @@
     justify-content: space-between;
 }
 section{
-    margin-top: 125px;
+    margin-top: 70px;
     margin-bottom: 125px;
 }
 .numeric-data{
