@@ -9,49 +9,54 @@ import Axios from 'axios';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [covidData, setCovidData] = useState({});
+  const [timeSeriesData, setTimeSeriesData] = useState({});
+  const [totalData, setTotalData] = useState({});
+  const [filterDays, setFilterDays] = useState(0);
 
   useEffect(() => {
-    let currentNewConfirmed = [];
-    let currentNewRecoveries = [];
-    let currentNewDeaths = [];
-    let currentCummulativeConfirmed = [];
-    let currentCummulativeDeaths = [];
-    let currentCummulativeRecoveries = [];
-    let currentCummulativeActive = [];
-    let currentDateLabels = [];
+    let newConfirmed = [];
+    let newRecoveries = [];
+    let newDeaths = [];
+    let cummulativeConfirmed = [];
+    let cummulativeDeaths = [];
+    let cummulativeRecoveries = [];
+    let cummulativeActive = [];
+    let dateLabels = [];
     Axios.get('https://raw.githubusercontent.com/jasonowen-s/covid62-data/main/data.json')
       .then((res) => {
-        const respoonseData = res.data;
-        respoonseData.update.harian.forEach(day => {
-          currentNewConfirmed.push(day.jumlah_positif.value);
-          currentNewDeaths.push(day.jumlah_meninggal.value);
-          currentNewRecoveries.push(day.jumlah_sembuh.value);
-          currentCummulativeConfirmed.push(day.jumlah_positif_kum.value);
-          currentCummulativeDeaths.push(day.jumlah_meninggal_kum.value);
-          currentCummulativeRecoveries.push(day.jumlah_sembuh_kum.value);
-          currentCummulativeActive.push(day.jumlah_positif_kum.value - day.jumlah_sembuh_kum.value - day.jumlah_meninggal_kum.value);
-          currentDateLabels.push(
+        const responseData = res.data;
+        responseData.update.harian.forEach(day => {
+          newConfirmed.push(day.jumlah_positif.value);
+          newDeaths.push(day.jumlah_meninggal.value);
+          newRecoveries.push(day.jumlah_sembuh.value);
+          cummulativeConfirmed.push(day.jumlah_positif_kum.value);
+          cummulativeDeaths.push(day.jumlah_meninggal_kum.value);
+          cummulativeRecoveries.push(day.jumlah_sembuh_kum.value);
+          cummulativeActive.push(day.jumlah_positif_kum.value - day.jumlah_sembuh_kum.value - day.jumlah_meninggal_kum.value);
+          dateLabels.push(
             new Date(day.key).toLocaleDateString('en-GB')
           );
         });
-        const currentLatestDate = new Date(respoonseData.update.harian[respoonseData.update.harian.length-1].key)
+        const currentLatestDate = new Date(responseData.update.harian[responseData.update.harian.length-1].key)
         .toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        const data = {
-          newConfirmed: currentNewConfirmed,
-          newDeaths: currentNewDeaths,
-          newRecoveries: currentNewRecoveries,
-          cummulativeConfirmed: currentCummulativeConfirmed,
-          cummulativeDeaths: currentCummulativeDeaths,
-          cummulativeReoveries: currentCummulativeRecoveries,
-          cummulativeActive: currentCummulativeActive,
-          totalConfirmed: currentCummulativeConfirmed[currentCummulativeConfirmed.length-1],
-          totalDeaths: currentCummulativeDeaths[currentCummulativeDeaths.length-1],
-          totalRecoveries: currentCummulativeRecoveries[currentCummulativeRecoveries.length-1],
-          dateLabels: currentDateLabels,
+        const timeSeriesData = {
+          newConfirmed: newConfirmed,
+          newDeaths: newDeaths,
+          newRecoveries: newRecoveries,
+          cummulativeConfirmed: cummulativeConfirmed,
+          cummulativeDeaths: cummulativeDeaths,
+          cummulativeReoveries: cummulativeRecoveries,
+          cummulativeActive: cummulativeActive,
+          dateLabels: dateLabels,
           latestDate: currentLatestDate,
         }
-        setCovidData(data);
+        const totalData = {
+          totalConfirmed: cummulativeConfirmed[cummulativeConfirmed.length-1],
+          totalDeaths: cummulativeDeaths[cummulativeDeaths.length-1],
+          totalRecoveries: cummulativeRecoveries[cummulativeRecoveries.length-1],
+        }
+        setTimeSeriesData(timeSeriesData);
+        setTotalData(totalData);
         setIsLoading(false);
       })
   }, []);
@@ -61,7 +66,7 @@ const App = () => {
       labels: ["recovered", "confirmed"],
       datasets: [
         {
-          data: [covidData.totalRecoveries, covidData.totalConfirmed],
+          data: [totalData.totalRecoveries, totalData.totalConfirmed],
           fill: true,
           backgroundColor: [
             Colors.BLUE,
@@ -77,7 +82,7 @@ const App = () => {
       labels: ["deaths", "confirmed"],
       datasets: [
         {
-          data: [covidData.totalDeaths, covidData.totalConfirmed],
+          data: [totalData.totalDeaths, totalData.totalConfirmed],
           fill: true,
           backgroundColor: [
             Colors.RED,
@@ -90,13 +95,13 @@ const App = () => {
 
   const _getIncrementalData = () => {
     return{
-      labels: covidData.dateLabels,
+      labels: timeSeriesData.dateLabels.slice(filterDays),
       datasets: [
         {
           label: "deaths",
           backgroundColor: Colors.RED,
           borderColor: Colors.RED,
-          data: covidData.newDeaths,
+          data: timeSeriesData.newDeaths.slice(filterDays),
           hidden: true,
           fill: false,
         },
@@ -104,7 +109,7 @@ const App = () => {
           label: "recovered",
           backgroundColor: Colors.BLUE,
           borderColor: Colors.BLUE,
-          data: covidData.newRecoveries,
+          data: timeSeriesData.newRecoveries.slice(filterDays),
           hidden: true,
           fill: false,
         },
@@ -112,7 +117,7 @@ const App = () => {
           label: "confirmed",
           backgroundColor: Colors.GREEN,
           borderColor: Colors.GREEN,
-          data: covidData.newConfirmed,
+          data: timeSeriesData.newConfirmed.slice(filterDays),
           fill: false,
         },
       ],
@@ -121,34 +126,34 @@ const App = () => {
 
   const _getCummulativeCasesData = () => {
     return{
-      labels: covidData.dateLabels,
+      labels: timeSeriesData.dateLabels.slice(filterDays),
       datasets: [
         {
           label: "deaths",
           backgroundColor: Colors.RED_TRANSPARENT,
           borderColor: Colors.RED,
-          data: covidData.cummulativeDeaths,
+          data: timeSeriesData.cummulativeDeaths.slice(filterDays),
           fill: true,
         },
         {
           label: "active",
           backgroundColor: Colors.WHITE_TRANSPARENT,
           borderColor: Colors.WHITE,
-          data: covidData.cummulativeActive,
+          data: timeSeriesData.cummulativeActive.slice(filterDays),
           fill: true,
         },
         {
           label: "recovered",
           backgroundColor: Colors.BLUE_TRANSPARENT,
           borderColor: Colors.BLUE,
-          data: covidData.cummulativeReoveries,
+          data: timeSeriesData.cummulativeReoveries.slice(filterDays),
           fill: true,
         },
         {
           label: "confirmed",
           backgroundColor: Colors.GREEN_TRANSPARENT,
           borderColor: Colors.GREEN,
-          data: covidData.cummulativeConfirmed,
+          data: timeSeriesData.cummulativeConfirmed.slice(filterDays),
           fill: true,
         },
       ],
@@ -159,26 +164,35 @@ const App = () => {
     return (
       <BounceLoader 
         css='
-          margin: 27vh auto;
-        '
-        size={300}
-        color={Colors.WHITE}
-        loading={isLoading}
-      />
-    )
-  }
+        margin: 27vh auto;
+      '
+      size={300}
+      color={Colors.WHITE}
+      loading={isLoading}
+    />
+  )
+}
 
-  return (
-    isLoading ? 
-    renderLoadingAnimation() :
-    <div className="App">
-      <div>
-        data last updated <span className='latest-date'> {covidData.latestDate} </span>
+return (
+  isLoading ? 
+  renderLoadingAnimation() :
+  <div className="App">
+    <span className='latest-date'> {timeSeriesData.latestDate} </span>
+    <div
+      class="filter"
+      style={{
+          display:'flex'
+        }}
+      >
+        <div class=""><i class="fa fa-filter" aria-hidden="true"></i></div>
+        <div class="" onClick={() => setFilterDays(0)} style={{marginRight:'1rem'}}>All</div>
+        <div class="" onClick={() => setFilterDays(-30)} style={{marginRight:'1rem'}}>30 Days</div>
+        <div class="" onClick={() => setFilterDays(-7)} style={{marginRight:'1rem'}}>7 Days</div>
       </div>
-      <Numeric confirmed={covidData.totalConfirmed} recovered={covidData.totalRecoveries} deaths={covidData.totalDeaths} />
-      <LineCharts incrementalData={_getIncrementalData()} cummulativeData={_getCummulativeCasesData()} />
-      <RatioCharts recoveryData={_getRecoveryData()} mortalityData={_getMortalityData()} />
-    </div>
+    <Numeric confirmed={totalData.totalConfirmed} recovered={totalData.totalRecoveries} deaths={totalData.totalDeaths} />
+    <LineCharts incrementalData={_getIncrementalData()} cummulativeData={_getCummulativeCasesData(filterDays)} />
+    <RatioCharts recoveryData={_getRecoveryData()} mortalityData={_getMortalityData()} />
+  </div>
   );
 }
 
