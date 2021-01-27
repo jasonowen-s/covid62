@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import * as Colors from './Colors';
-import githubLogo from './github-white.png'
+import * as Colors from './Constants/Colors';
+import githubLogo from './Images/github-white.png'
 
 ReactDOM.render(
   <React.StrictMode>

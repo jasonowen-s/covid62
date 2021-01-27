@@ -1,5 +1,5 @@
 import React from 'react';
-import * as Colors from './Colors';
+import * as Colors from '../Constants/Colors';
 
 function Numeric(props){
     return(

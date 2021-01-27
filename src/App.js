@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import * as Colors from './Colors';
-import Numeric from './Numeric';
-import LineCharts from './LineCharts';
-import RatioCharts from './RatioCharts';
+import * as Colors from './Constants/Colors';
+import Numeric from './Components/Numeric';
+import LineCharts from './Components/LineCharts';
+import RatioCharts from './Components/RatioCharts';
 import {BounceLoader} from 'react-spinners';
 import './App.css';
 import Axios from 'axios';

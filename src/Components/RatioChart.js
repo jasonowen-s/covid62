@@ -1,6 +1,6 @@
 import React from 'react';
 import { Doughnut, Chart } from "react-chartjs-2";
-import * as Colors from './Colors';
+import * as Colors from '../Constants/Colors';
 
 
 // Variation of K Scandrett's code on StackOverflow
