@@ -183,6 +183,7 @@ const renderFilterDays = () => {
   ];
   return (
     <Radio.Group
+      style={{marginTop:'1.5rem'}}
       options={options}
       onChange={(event) => setFilterDays(event.target.value)}
       value={filterDays}

@@ -1,12 +1,12 @@
   .ant-radio-button-wrapper {
     position: relative;
     display: inline-block;
-    height: 32px;
+    height: 53px;
     margin: 0;
     padding: 0 15px;
     color: rgba(0, 0, 0, 0.85);
-    font-size: 14px;
-    line-height: 30px;
+    font-size: 28px;
+    line-height: 50px;
     background: #fff;
     border: 1px solid #fff;
     border-top-width: 1.02px;
